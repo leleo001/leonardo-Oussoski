@@ -2,30 +2,83 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Formulário de Endereço</title>
+  <title>Consulta de Endereço por CEP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 400px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
 </head>
 <body>
+  <h2>Consulta de Endereço por CEP</h2>
+  <label for="cep">CEP:</label>
+  <input type="text" id="cep" maxlength="9" placeholder="Digite o CEP">
 
-  <h2>Formulário de Endereço</h2>
+  <label for="rua">Rua:</label>
+  <input type="text" id="rua" readonly>
 
-  <form>
-    <label>CEP:</label><br>
-    <input type="text" name="cep"><br><br>
+  <label for="bairro">Bairro:</label>
+  <input type="text" id="bairro" readonly>
 
-    <label>Rua:</label><br>
-    <input type="text" name="rua"><br><br>
+  <label for="cidade">Cidade:</label>
+  <input type="text" id="cidade" readonly>
 
-    <label>Bairro:</label><br>
-    <input type="text" name="bairro"><br><br>
+  <label for="estado">Estado:</label>
+  <input type="text" id="estado" readonly>
 
-    <label>Cidade:</label><br>
-    <input type="text" name="cidade"><br><br>
+  <button onclick="buscarCEP()">Buscar Endereço</button>
 
-    <label>Estado:</label><br>
-    <input type="text" name="estado"><br><br>
+  <script>
+    function buscarCEP() {
+      const cep = document.getElementById('cep').value.replace(/\D/g, '');
 
-    <input type="submit" value="Enviar">
-  </form>
+      if (cep.length !== 8) {
+        alert('CEP inválido. Digite 8 números.');
+        return;
+      }
 
+      fetch(`https://viacep.com.br/ws/${cep}/json/`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.erro) {
+            alert('CEP não encontrado.');
+            return;
+          }
+
+          document.getElementById('rua').value = data.logradouro;
+          document.getElementById('bairro').value = data.bairro;
+          document.getElementById('cidade').value = data.localidade;
+          document.getElementById('estado').value = data.uf;
+        })
+        .catch(error => {
+          console.error('Erro ao buscar o CEP:', error);
+          alert('Erro ao buscar o CEP.');
+        });
+    }
+  </script>
 </body>
 </html>
